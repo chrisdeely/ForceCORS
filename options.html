@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>ForceCORS Options</title>
+    <link rel="stylesheet" href="bootstrap.min.css"/>
+    <style type="text/css">
+        td {
+            vertical-align: middle;
+        }
+    </style>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="options.js"></script>
+</head>
+<body>
+<h1>ForceCORS Settings</h1>
+
+<p>Below you can specify the desired headers to add or replace per each URL. Use '*' as a wildcard</p>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="span4">
+            <label for="activeURL">URL</label>
+            <select id="activeURL"></select>
+        </div>
+        <div class="span8">
+            <table id="headersTable" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Header Name</th>
+                    <th>Header Value</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <button class="btn">Add Header</button>
+</div>
+
+<form id="addNewURLForm" action="#">
+    <label for="newURL">URL</label> <input id="newURL" type="text"/>
+    <button class="btn" type="submit">Add</button>
+</form>
+
+
+<button class="btn btn-success" id="saveAll">Save All</button>
+
+</body>
+</html>
