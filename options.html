@@ -5,9 +5,9 @@
     <title>ForceCORS Options</title>
     <link rel="stylesheet" href="bootstrap.min.css"/>
     <style type="text/css">
-        td {
-            vertical-align: middle;
-        }
+       input {
+           margin-bottom: 0;
+       }
     </style>
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="options.js"></script>
@@ -21,8 +21,13 @@
 <div class="container-fluid">
     <div class="row">
         <div class="span4">
-            <label for="activeURL">URL</label>
+            <label for="activeURL">Settings for: </label>
             <select id="activeURL"></select>
+
+            <form id="addNewURLForm" action="#">
+                <label for="newURL">Add URL</label> <input id="newURL" type="text"/>
+                <button class="btn" type="submit">Add</button>
+            </form>
         </div>
         <div class="span8">
             <table id="headersTable" class="table table-bordered table-striped">
@@ -36,19 +41,18 @@
 
                 </tbody>
             </table>
+            <button class="btn addHeader">Add Header</button>
         </div>
     </div>
-
-    <button class="btn">Add Header</button>
+    <div class="row span12" style="margin-left: 0">
+        <button class="btn btn-success" id="saveAll">Save All</button>
+        <button class="btn btn-warning" id="deleteSelected">Delete Selected</button>
+        <button class="btn btn-danger" id="deleteAll">Delete All</button>
+    </div>
 </div>
 
-<form id="addNewURLForm" action="#">
-    <label for="newURL">URL</label> <input id="newURL" type="text"/>
-    <button class="btn" type="submit">Add</button>
-</form>
-
-
-<button class="btn btn-success" id="saveAll">Save All</button>
+<div class="row span4 alert alert-block alert-success">Settings saved!</div>
+<div class="row span4 alert alert-block alert-error">An error occurred</div>
 
 </body>
 </html>
