@@ -5,9 +5,13 @@
     <title>ForceCORS Options</title>
     <link rel="stylesheet" href="bootstrap.min.css"/>
     <style type="text/css">
-       input {
-           margin-bottom: 0;
-       }
+        body {
+            padding: 2em;
+        }
+
+        input {
+            margin-bottom: 0;
+        }
     </style>
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="options.js"></script>
@@ -15,21 +19,28 @@
 <body>
 <h1>ForceCORS Settings</h1>
 
-<p>Below you can specify the desired headers to add or replace per each URL. Use '*' as a wildcard</p>
+<p>Below you can specify the desired headers to add or replace per each URL.
+    <br/>Use '*' as a wildcard (which you most likely want at the end of each URL: http://www.something.com/*)
+    <br/>For the full URL filter syntax, see: <a href="https://code.google.com/chrome/extensions/match_patterns.html"
+                                                 target="_blank">https://code.google.com/chrome/extensions/match_patterns.html</a>
+    <br/>For a reference of CORS headers, see: <a href="http://www.w3.org/TR/cors/#syntax" target="_blank">http://www.w3.org/TR/cors/#syntax</a>
+</p>
 
 
 <div class="container-fluid">
     <div class="row">
-        <div class="span4">
-            <label for="activeURL">Settings for: </label>
-            <select id="activeURL"></select>
 
+        <div class="span4">
             <form id="addNewURLForm" action="#">
                 <label for="newURL">Add URL</label> <input id="newURL" type="text"/>
                 <button class="btn" type="submit">Add</button>
             </form>
         </div>
+
         <div class="span8">
+            <label for="activeURL">Settings for: </label>
+            <select id="activeURL"></select>
+
             <table id="headersTable" class="table table-bordered table-striped">
                 <thead>
                 <tr>

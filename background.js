@@ -48,8 +48,22 @@ function retrieveSettings() {
     return JSON.parse(siteSettings);
 }
 
+/**
+ * Looks for a set of headers that match the provided URL
+ * @param url {String} The URL of the currently executing request
+ * @param headersPerUrl {Object} dictionary object using URL as key
+ */
 function matchUrlToHeaders(url, headersPerUrl) {
-    return [];
+     for(var key in headersPerUrl){
+
+         //this match is expecting that the user will specify URL domain
+         //so key==http://www.foo.com && url==http://www.foo.com/?x=bar&whatever=12
+         //maybe support regex in the future
+         if(url.indexOf(key) >-1) {
+             return headersPerUrl[key];
+         }
+     }
+    return null;
 }
 
 var settings = retrieveSettings(),
@@ -70,15 +84,18 @@ if(settings) {
 
 chrome.webRequest.onHeadersReceived.addListener(
     function (info) {
-
         var desiredHeaders = matchUrlToHeaders(info.url, headersPerUrl);
+
+        if(!desiredHeaders)
+            return {};
 
         return { responseHeaders:mergeNewHeaders(info.responseHeaders, desiredHeaders) };
 
     },
     // filters
     {
-        urls:urlsToAlter
+        urls:urlsToAlter,
+        types:['xmlhttprequest']
     },
     // extraInfoSpec
     ["blocking", "responseHeaders"]
