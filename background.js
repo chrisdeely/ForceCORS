@@ -76,7 +76,7 @@ if(settings) {
         urlsToAlter.push(settings[i].URL);
 
         //use the URL as a key in the dictionary to lookup the specific headers to manipulate for that URL
-        headersPerUrl[ settings[i].URL ] = settings[i].headers;
+        headersPerUrl[ settings[i].URL.replace(/\*/g,'') ] = settings[i].headers;
     }
 }
 
@@ -94,8 +94,7 @@ chrome.webRequest.onHeadersReceived.addListener(
     },
     // filters
     {
-        urls:urlsToAlter,
-        types:['xmlhttprequest']
+        urls:urlsToAlter
     },
     // extraInfoSpec
     ["blocking", "responseHeaders"]

@@ -10,8 +10,5 @@
         "scripts":["background.js"]
     },
     "options_page":"options.html",
-    "manifest_version":2,
-    "web_accessible_resources": [
-        "jquery.min.js"
-    ]
+    "manifest_version":2
 }
