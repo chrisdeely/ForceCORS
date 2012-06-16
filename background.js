@@ -54,48 +54,88 @@ function retrieveSettings() {
  * @param headersPerUrl {Object} dictionary object using URL as key
  */
 function matchUrlToHeaders(url, headersPerUrl) {
-     for(var key in headersPerUrl){
+    for (var key in headersPerUrl) {
 
-         //this match is expecting that the user will specify URL domain
-         //so key==http://www.foo.com && url==http://www.foo.com/?x=bar&whatever=12
-         //maybe support regex in the future
-         if(url.indexOf(key) >-1) {
-             return headersPerUrl[key];
-         }
-     }
+        //this match is expecting that the user will specify URL domain
+        //so key==http://www.foo.com && url==http://www.foo.com/?x=bar&whatever=12
+        //maybe support regex in the future
+        if (url.indexOf(key) > -1) {
+            return headersPerUrl[key];
+        }
+    }
     return null;
 }
 
-var settings = retrieveSettings(),
-    headersPerUrl = {},
-    urlsToAlter = [];
+/**
+ * Responds to Chrome's onHeadersReceived event and injects all headers defined for the given URL
+ * @param info {Object} Contains the request info
+ * @see http://code.google.com/chrome/extensions/webRequest.html#event-onHeadersReceived
+ */
+function onHeadersReceivedHandler(info) {
+    var desiredHeaders = matchUrlToHeaders(info.url, headersPerUrl);
 
-if(settings) {
-    for(var l = settings.length, i=0; i<l; i++) {
-        //push each URL we wish to watch for into the array
-        urlsToAlter.push(settings[i].URL);
+    if (!desiredHeaders)
+        return {};
 
-        //use the URL as a key in the dictionary to lookup the specific headers to manipulate for that URL
-        headersPerUrl[ settings[i].URL.replace(/\*/g,'') ] = settings[i].headers;
-    }
+    return { responseHeaders:mergeNewHeaders(info.responseHeaders, desiredHeaders) };
+
 }
 
+/**
+ * A dictionary of header settings, keyed using the URLs supplied in the Options page
+ */
+var headersPerUrl;
 
+/**
+ * An array of the URL patterns specified on the Options page. Used to filter out the requests we wish to monitor
+ */
+var urlsToAlter;
 
-chrome.webRequest.onHeadersReceived.addListener(
-    function (info) {
-        var desiredHeaders = matchUrlToHeaders(info.url, headersPerUrl);
+/**
+ * Initializes the background page by retrieving settings and establishing the onHeadersReceived listener.
+ * This method is called upon initialization, and also when the user changes settings on the Options page.
+ */
+function init() {
 
-        if(!desiredHeaders)
-            return {};
+    var settings = retrieveSettings();
+    headersPerUrl = {};
+    urlsToAlter = [];
 
-        return { responseHeaders:mergeNewHeaders(info.responseHeaders, desiredHeaders) };
+    if (settings) {
+        for (var l = settings.length, i = 0; i < l; i++) {
+            //push each URL we wish to watch for into the array
+            urlsToAlter.push(settings[i].URL);
 
-    },
-    // filters
-    {
-        urls:urlsToAlter
-    },
-    // extraInfoSpec
-    ["blocking", "responseHeaders"]
-);
+            //use the URL as a key in the dictionary to lookup the specific headers to manipulate for that URL
+            headersPerUrl[ settings[i].URL.replace(/\*/g, '') ] = settings[i].headers;
+        }
+    }
+
+    //when the user updates the settings via the Options page, we need to remove and re-add the listener
+    //especially to update the URL filters
+    if(chrome.webRequest.onHeadersReceived.hasListener(onHeadersReceivedHandler)) {
+        chrome.webRequest.onHeadersReceived.removeListener(onHeadersReceivedHandler)
+    }
+
+    chrome.webRequest.onHeadersReceived.addListener(
+        onHeadersReceivedHandler,
+        // filters
+        {
+            urls:urlsToAlter
+        },
+        // extraInfoSpec
+        ["blocking", "responseHeaders"]
+    );
+}
+
+//establish a listener to respond to changes from the Options page
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+    //retrigger the init method to load the new settings
+    init();
+
+    //respond that we got the message
+    sendResponse();
+});
+
+//make rocket go now!
+init();

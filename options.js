@@ -204,8 +204,11 @@ function storeAndAlert() {
     try {
         storeSettings(currentSettings);
 
-        $('.alert-success').show();
-        $('.alert-success').fadeOut(2500);
+        chrome.extension.sendRequest('update', function(response){
+            $('.alert-success').show();
+            $('.alert-success').fadeOut(2500);
+        });
+
 
     } catch (e) {
         $('.alert-error').text('An error occurred: ' + e.toString());
