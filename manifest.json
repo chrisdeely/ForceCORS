@@ -6,6 +6,9 @@
         "http://*/*",
         "https://*/*"
     ],
+    "browser_action": {
+        "default_icon": "images/Unlock48.png"
+    },
     "background":{
         "scripts":["background.js"]
     },

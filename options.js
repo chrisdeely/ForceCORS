@@ -1,10 +1,10 @@
-var currentSettings;
+var currentSiteSettings;
 
 /**
- * Retrieves the saved settings from localstorage
+ * Retrieves the saved site definitions from localstorage
  * @return an Array of Objects containing { URL:String, headers:[ {name:String, value:String} ] }
  */
-function retrieveSettings() {
+function retrieveSiteSettings() {
     var siteSettings = localStorage['corsSites'];
 
     if (!siteSettings) {
@@ -18,7 +18,7 @@ function retrieveSettings() {
  * Stores the provided settings in the extension's localstorage area
  * @param settings an Array of an Array of Objects containing { URL:String, headers:[ {name:String, value:String} ] }
  */
-function storeSettings(settings) {
+function storeSiteSettings(settings) {
     localStorage['corsSites'] = JSON.stringify(settings);
 }
 
@@ -111,7 +111,7 @@ function populateHeadersTable(item, tableBody) {
  * @param event the jQuery event
  */
 function urlSelectionChanged(event) {
-    var item = currentSettings[ $(event.target).find('option:selected').index() ];
+    var item = currentSiteSettings[ $(event.target).find('option:selected').index() ];
     populateHeadersTable(item, $('#headersTable tbody'));
 }
 
@@ -122,9 +122,9 @@ function renderSelectOptions() {
     urlSelect.empty();
 
     //populate select with all currently tracked URLs
-    for (var i = 0, l = currentSettings.length; i < l; i++) {
+    for (var i = 0, l = currentSiteSettings.length; i < l; i++) {
 
-        var item = $('<option></option>').attr('value', i).text(currentSettings[i].URL);
+        var item = $('<option></option>').attr('value', i).text(currentSiteSettings[i].URL);
         if (i == 0) {
             item.attr("selected", "selected");
         }
@@ -140,7 +140,7 @@ function renderSelectOptions() {
 
 $(document).ready(function () {
     //check localStorage for any existing URL settings
-    currentSettings = retrieveSettings() || [  ];
+    currentSiteSettings = retrieveSiteSettings() || [  ];
 
     var urlSelect = renderSelectOptions();
 
@@ -152,10 +152,10 @@ $(document).ready(function () {
             URL:$('#newURL').val(),
             headers:[]
         };
-        currentSettings.push(newRule);
+        currentSiteSettings.push(newRule);
 
         //add a new option to the select
-        urlSelect.append($('<option></option>').attr('value', currentSettings.length - 1).text(newRule.URL));
+        urlSelect.append($('<option></option>').attr('value', currentSiteSettings.length - 1).text(newRule.URL));
 
         //make the new option selected
         urlSelect.find('option:selected').attr('selected', false);
@@ -174,6 +174,13 @@ $(document).ready(function () {
     //hide the alerts
     $('.alert').hide();
 
+    //check to see if user wants to display intercept count
+    var displayCountCB = $('#displayCount'),
+        displayCount = localStorage['displayInterceptCount'];
+
+    if(!!displayCount)
+        displayCountCB.attr('checked', null);
+
     //enable the save button
     var saveBtn = $('#saveAll');
     saveBtn.bind('click', storeAndAlert);
@@ -181,7 +188,7 @@ $(document).ready(function () {
     //enable deleting all settings
     var delAll = $('#deleteAll');
     delAll.bind('click', function () {
-        currentSettings = [];
+        currentSiteSettings = [];
         storeAndAlert();
         renderSelectOptions();
     });
@@ -190,7 +197,7 @@ $(document).ready(function () {
     var delSel = $('#deleteSelected');
     delSel.bind('click',function(){
         var index = urlSelect.find('option:selected').val();
-        currentSettings.splice(index,1);
+        currentSiteSettings.splice(index,1);
         storeAndAlert();
         renderSelectOptions();
     });
@@ -202,7 +209,8 @@ $(document).ready(function () {
 function storeAndAlert() {
 
     try {
-        storeSettings(currentSettings);
+        storeSiteSettings(currentSiteSettings);
+        localStorage['displayInterceptCount'] = $(this).attr('checked') === 'checked';
 
         chrome.extension.sendRequest('update', function(response){
             $('.alert-success').show();

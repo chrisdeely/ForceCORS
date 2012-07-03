@@ -1,4 +1,24 @@
 /**
+ * A dictionary of header settings, keyed using the URLs supplied in the Options page
+ */
+var headersPerUrl;
+
+/**
+ * An array of the URL patterns specified on the Options page. Used to filter out the requests we wish to monitor
+ */
+var urlsToAlter;
+
+/**
+ * Maintains a count of the number of modified responses for display in the browser badge area
+ */
+var alteredCount = 0;
+
+/**
+ * Only display the alteredCount if the user wishes
+ */
+var displayCount = true;
+
+/**
  * Returns the index of a given header object in the provided array
  * @param headerArray The Array to search in
  * @param newHeader The header to find
@@ -77,19 +97,26 @@ function onHeadersReceivedHandler(info) {
     if (!desiredHeaders)
         return {};
 
+    if (displayCount) {
+        chrome.browserAction.setBadgeText({ text:(++alteredCount).toString()});
+    }
+
     return { responseHeaders:mergeNewHeaders(info.responseHeaders, desiredHeaders) };
 
 }
 
 /**
- * A dictionary of header settings, keyed using the URLs supplied in the Options page
+ * Opens the Options page in a new tab
  */
-var headersPerUrl;
+function showOptionsPage() {
+    chrome.tabs.create(
+        {
+            url:chrome.extension.getURL('/options.html')
+        }
+    );
+}
 
-/**
- * An array of the URL patterns specified on the Options page. Used to filter out the requests we wish to monitor
- */
-var urlsToAlter;
+
 
 /**
  * Initializes the background page by retrieving settings and establishing the onHeadersReceived listener.
@@ -111,9 +138,16 @@ function init() {
         }
     }
 
+    chrome.browserAction.setBadgeText({ text:''});
+    displayCount = (localStorage['displayInterceptCount'] == undefined) ? true : JSON.parse(localStorage['displayInterceptCount']);
+
+    //show options page on icon click
+    chrome.browserAction.onClicked.removeListener(showOptionsPage);
+    chrome.browserAction.onClicked.addListener(showOptionsPage);
+
     //when the user updates the settings via the Options page, we need to remove and re-add the listener
     //especially to update the URL filters
-    if(chrome.webRequest.onHeadersReceived.hasListener(onHeadersReceivedHandler)) {
+    if (chrome.webRequest.onHeadersReceived.hasListener(onHeadersReceivedHandler)) {
         chrome.webRequest.onHeadersReceived.removeListener(onHeadersReceivedHandler)
     }
 
@@ -129,13 +163,14 @@ function init() {
 }
 
 //establish a listener to respond to changes from the Options page
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+chrome.extension.onRequest.addListener(function (request, sender, sendResponse) {
     //retrigger the init method to load the new settings
     init();
 
     //respond that we got the message
     sendResponse();
 });
+
 
 //make rocket go now!
 init();
