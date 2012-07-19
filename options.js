@@ -176,10 +176,9 @@ $(document).ready(function () {
 
     //check to see if user wants to display intercept count
     var displayCountCB = $('#displayCount'),
-        displayCount = localStorage['displayInterceptCount'];
+        displayCount = JSON.parse(localStorage['displayInterceptCount']);
 
-    if(!!displayCount)
-        displayCountCB.attr('checked', null);
+        displayCountCB.attr('checked', displayCount ? 'checked' : null);
 
     //enable the save button
     var saveBtn = $('#saveAll');
@@ -210,9 +209,9 @@ function storeAndAlert() {
 
     try {
         storeSiteSettings(currentSiteSettings);
-        localStorage['displayInterceptCount'] = $(this).attr('checked') === 'checked';
+        localStorage['displayInterceptCount'] = $('#displayCount').attr('checked') === 'checked';
 
-        chrome.extension.sendRequest('update', function(response){
+        chrome.extension.sendRequest('update', function(){
             $('.alert-success').show();
             $('.alert-success').fadeOut(2500);
         });
