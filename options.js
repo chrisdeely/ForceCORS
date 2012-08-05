@@ -31,11 +31,9 @@ function populateHeadersTable(item, tableBody) {
 
     tableBody.empty();
 
-    if (!item)
-        return;
+    if (!item) return;
 
-    if (!item.headers)
-        return;
+    if (!item.headers) return;
 
     // creates a click handler to turn on editing of the cell.
     // Requires a reference to the header data and a property name to bind to
@@ -138,6 +136,10 @@ function renderSelectOptions() {
     return urlSelect;
 }
 
+function displayExportModal() {
+    
+}
+
 $(document).ready(function () {
     //check localStorage for any existing URL settings
     currentSiteSettings = retrieveSiteSettings() || [  ];
@@ -176,8 +178,14 @@ $(document).ready(function () {
 
     //check to see if user wants to display intercept count
     var displayCountCB = $('#displayCount'),
-        displayCount = JSON.parse(localStorage['displayInterceptCount']);
+        displayCount = localStorage['displayInterceptCount'];
 
+        try {
+         displayCount = JSON.parse( displayCount );   
+        }catch(e){
+         displayCount = true;   
+        }
+        
         displayCountCB.attr('checked', displayCount ? 'checked' : null);
 
     //enable the save button
@@ -200,6 +208,32 @@ $(document).ready(function () {
         storeAndAlert();
         renderSelectOptions();
     });
+    
+    //import/export
+    $('#exportModal').on('show',function(){
+        var modal = $(this),
+            ta = modal.find('textarea'),
+            cg = modal.find('.control-group'),
+            submit = modal.find('.btn-primary'),
+            errMsg = modal.find('.help-inline');
+        
+        ta.text(FormatJSON(currentSiteSettings));
+        
+        submit.on('click', function(){
+            cg.removeClass('error');
+            errMsg.hide();
+            
+            try {
+               currentSiteSettings = JSON.parse(ta.val());
+                modal.modal('hide');
+               storeAndAlert();
+            }catch(e){
+                errMsg.text('Unable to parse the input as JSON: '+e.toString());
+                errMsg.show();
+                cg.addClass('error');
+            }
+        })
+    });
 });
 
 /**
@@ -212,6 +246,7 @@ function storeAndAlert() {
         localStorage['displayInterceptCount'] = $('#displayCount').attr('checked') === 'checked';
 
         chrome.extension.sendRequest('update', function(){
+            renderSelectOptions();
             $('.alert-success').show();
             $('.alert-success').fadeOut(2500);
         });
