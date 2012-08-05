@@ -1,3 +1,6 @@
+/**
+* FormatJSON - written by Jon Combe - http://joncom.be/code/javascript-json-formatter/
+**/
 function RealTypeOf(v) {
   if (typeof(v) == "object") {
     if (v === null) return "null";
