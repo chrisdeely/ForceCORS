@@ -216,24 +216,48 @@ $(document).ready(function () {
             cg = modal.find('.control-group'),
             submit = modal.find('.btn-primary'),
             errMsg = modal.find('.help-inline');
-        
+
         ta.text(FormatJSON(currentSiteSettings));
-        
-        submit.on('click', function(){
+
+        submit.bind('click', function(){
             cg.removeClass('error');
             errMsg.hide();
-            
-            try {
-               currentSiteSettings = JSON.parse(ta.val());
-                modal.modal('hide');
-               storeAndAlert();
-            }catch(e){
-                errMsg.text('Unable to parse the input as JSON: '+e.toString());
-                errMsg.show();
-                cg.addClass('error');
-            }
+
+            require(['validate','dataSchema'],function(validate, schema){
+                try {
+                    var value = JSON.parse(ta.val());
+                    var validation = validate(value, schema);
+
+                    if(validation.valid){
+                        currentSiteSettings = value;
+                        modal.modal('hide');
+                        storeAndAlert();
+                    }else{
+                        var msg = "Encountered errors parsing your JSON:<ul>";
+                        for(var i=0,l=validation.errors.length;i<l;i++){
+                            msg += "<li>" + validation.errors[i].property +" "+validation.errors[i].message +"</li>";
+                        }
+                        msg += "</ul>";
+
+                        errMsg.html(msg);
+                        errMsg.show();
+                        cg.addClass('error');
+                    }
+                }catch(e){
+                    errMsg.text('Unable to parse the input as JSON: '+e.toString());
+                    errMsg.show();
+                    cg.addClass('error');
+                }
+            });
+
         })
     });
+
+    $('#exportModal').on('hide',function(){
+        var modal = $(this),
+            submit = modal.find('.btn-primary');
+        submit.unbind();
+    })
 });
 
 /**
