@@ -1,6 +1,6 @@
 {
     "name":"ForceCORS",
-    "version":"1.0",
+    "version":"1.1",
     "description":"Allows web developers to force Cross-Origin Resource Sharing headers to be applied to any desired URL. This is helpful when attempting to access remote services from a local host.",
     "permissions":["webRequest", "webRequestBlocking",
         "http://*/*",
