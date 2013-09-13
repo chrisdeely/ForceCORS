@@ -29,3 +29,14 @@ From the Extensions page, click the "Options" link below the ForceCORS entry.
 * Hit the "Add Header" button to add a new header setting
 * Supply both a header name and value and hit 'Save' for each
 * Hit the 'Save All' button to update the extension settings
+* 
+Example : 
+-----
+
+*If you want to allow all your localhost files to be able to access the remote host www.xyz.com
+
+*URL : http://xyz.com/ 
+
+*Header: Access-Control-Allow-Origin
+
+*Value : http://localhost/
