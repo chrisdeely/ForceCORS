@@ -35,7 +35,7 @@ Example :
 
 *If you want to allow all your localhost files to be able to access the remote host www.xyz.com
 
-*URL : http://xyz.com/ 
+ URL : http://xyz.com/* 
 
 *Header: Access-Control-Allow-Origin
 
