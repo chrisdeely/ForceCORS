@@ -14,8 +14,9 @@ Installation
 To install the extension into Chrome (tested on version 20)
 
 * Download the source, or checkout via git
-    git checkout https://github.com/chrisdeely/ForceCORS.git
-* Open Chrome, hit the Wrench > Tools Extensions
+
+        git checkout https://github.com/chrisdeely/ForceCORS.git
+* Open Chrome, hit the Settings Icon > Tools > Extensions
 * Enable "Developer Mode" via the checkbox at the top
 * Click the "Load unpacked extension" button and select the folder where you downloaded the code
 
