@@ -1,7 +1,14 @@
 {
     "name":"ForceCORS",
+    "author":"Chris Deely",
     "version":"1.1",
-    "description":"Allows web developers to force Cross-Origin Resource Sharing headers to be applied to any desired URL. This is helpful when attempting to access remote services from a local host.",
+    "description":"Allows forcing Cross-Origin Resource Sharing headers on any desired URL; helpful when accessing remote services from a local host.",
+    "homepage_url":"https://github.com/chrisdeely/ForceCORS",
+    "icons": { 
+        "16": "images/Unlock16.png",
+        "48": "images/Unlock16.png",
+        "128": "images/Unlock16.png" 
+    },
     "permissions":["webRequest", "webRequestBlocking",
         "http://*/*",
         "https://*/*"
