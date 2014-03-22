@@ -110,7 +110,7 @@ function populateHeadersTable(item, tableBody) {
  */
 function urlSelectionChanged(event) {
     var item = currentSiteSettings[ $(event.target).find('option:selected').index() ];
-    populateHeadersTable(item, $('#headersTable tbody'));
+    populateHeadersTable(item, $('#headersTable').find('tbody'));
 }
 
 function renderSelectOptions() {
@@ -136,10 +136,6 @@ function renderSelectOptions() {
     return urlSelect;
 }
 
-function displayExportModal() {
-    
-}
-
 $(document).ready(function () {
     //check localStorage for any existing URL settings
     currentSiteSettings = retrieveSiteSettings() || [  ];
@@ -150,10 +146,11 @@ $(document).ready(function () {
     var addURLForm = $('#addNewURLForm');
     addURLForm.bind('submit', function () {
         //create the new, blank rule set
-        var newRule = {
-            URL:$('#newURL').val(),
-            headers:[]
-        };
+        var $input = $('#newURL'),
+            newRule = {
+                URL:$input.val(),
+                headers:[]
+            };
         currentSiteSettings.push(newRule);
 
         //add a new option to the select
@@ -166,7 +163,7 @@ $(document).ready(function () {
         urlSelect.change();
 
         //clear the old text
-        $('#newURL').val('');
+       $input.val('');
 
         //add a header right away
         $('.addHeader').click();
@@ -211,7 +208,8 @@ $(document).ready(function () {
     });
     
     //import/export
-    $('#exportModal').on('show',function(){
+    var exportModal = $('#exportModal');
+    exportModal.on('show',function(){
         var modal = $(this),
             ta = modal.find('textarea'),
             cg = modal.find('.control-group'),
@@ -252,9 +250,7 @@ $(document).ready(function () {
             });
 
         })
-    });
-
-    $('#exportModal').on('hide',function(){
+    }).on('hide',function(){
         var modal = $(this),
             submit = modal.find('.btn-primary');
         submit.unbind();
@@ -265,22 +261,23 @@ $(document).ready(function () {
  * Stores the current settings and reports on success or failure to the UI
  */
 function storeAndAlert() {
-
+    var successAlert = $('.alert-success'),
+        errorAlert = $('.alert-error');
     try {
         storeSiteSettings(currentSiteSettings);
         localStorage['displayInterceptCount'] = $('#displayCount').attr('checked') === 'checked';
 
         chrome.extension.sendRequest('update', function(){
             renderSelectOptions();
-            $('.alert-success').show();
-            $('.alert-success').fadeOut(2500);
+            successAlert.show();
+            successAlert.fadeOut(2500);
         });
 
 
     } catch (e) {
-        $('.alert-error').text('An error occurred: ' + e.toString());
-        $('.alert-error').show();
-        $('.alert-error').fadeOut(5000);
+        errorAlert.text('An error occurred: ' + e.toString());
+        errorAlert.show();
+        errorAlert.fadeOut(5000);
     }
 }
 
