@@ -160,6 +160,15 @@ function init() {
         // extraInfoSpec
         ["blocking", "responseHeaders"]
     );
+
+    chrome.webRequest.onErrorOccurred.addListener(
+        function(info){console.log('ForceCORS was unable to modify headers for: '+info.url +' - '+info.error)},
+        {
+            urls:urlsToAlter
+        }
+    );
+
+    chrome.webRequest.handlerBehaviorChanged();
 }
 
 //establish a listener to respond to changes from the Options page
