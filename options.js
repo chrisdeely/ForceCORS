@@ -160,8 +160,7 @@ $(document).ready(function () {
         urlSelect.append($('<option></option>').attr('value', currentSiteSettings.length - 1).text(newRule.URL));
 
         //make the new option selected
-        urlSelect.find('option:selected').attr('selected', false);
-        urlSelect.find('option').last().attr('selected', true);
+        urlSelect.find('option').attr('selected', false).last().attr('selected', true);
 
         //trigger the change handler
         urlSelect.change();
@@ -171,6 +170,8 @@ $(document).ready(function () {
 
         //add a header right away
         $('.addHeader').click();
+
+        return false;
     });
 
     //hide the alerts
