@@ -168,11 +168,17 @@ function getRequestAndCleanUp(info) {
 
     var request = null;
 
+    // Array.prototype.filter method
+    // - callback ~ return true (keep) or false (remove)
+    //  - finds the current element - fitlered
+    //  - return true (keep) if now is less than expiration
+    //
     requestIds = requestIds.filter(function(elem) {
         if (elem.requestId === requestId) {
             request = elem;
+            return false;
         }
-        return (elem.expiration < now && elem.requestId !== requestId);
+        return (now < elem.expiration);
     });
 
     return request;
