@@ -19,6 +19,39 @@ var alteredCount = 0;
 var displayCount = true;
 
 /**
+ * List of appendable headers
+ * @source https://github.com/WebKit/webkit/blob/5277f6fb92b0c03958265d24a7692142f7bdeaf8/Source/WebCore/platform/network/curl/ResourceHandleManager.cpp#L354
+ */
+var APPENDABLE_HEADERS = [
+  'access-control-allow-headers',
+  'access-control-allow-methods',
+  'access-control-allow-origin',
+  'access-control-expose-headers',
+  'allow',
+  'cache-control',
+  'connection',
+  'content-encoding',
+  'content-language',
+  'if-match',
+  'if-none-match',
+  'keep-alive',
+  'pragma',
+  'proxy-authenticate',
+  'public',
+  'server',
+  'set-cookie',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+  'user-agent',
+  'vary',
+  'via',
+  'warning',
+  'www-authenticate'
+];
+
+/**
  * Returns the index of a given header object in the provided array
  * @param headerArray The Array to search in
  * @param newHeader The header to find
@@ -39,7 +72,33 @@ function getHeaderIndex(headerArray, newHeader) {
 function mergeNewHeaders(originalHeaders, newHeaders) {
     //copy the headers for our own usage
     var mergedHeaders = originalHeaders.slice();
-    for (var i = 0, len = newHeaders.length; i < len; i++) {
+    var headerRefMap = {};
+    var i, len;
+
+    // Pre-process headers by merging duplicate entries
+    for (i = 0, len = mergedHeaders.length; i < len; ) {
+        var header = mergedHeaders[i];
+        var name   = header.name.toLowerCase();
+
+        if (!headerRefMap.hasOwnProperty(name)) {
+            headerRefMap[name] = header;
+            i++;
+        } else {
+            // Header already set ! Remove it from the list
+            // and modify the original header reference by
+            // concataining its value or replacing it.
+            if (APPENDABLE_HEADERS.indexOf(name) > -1) {
+                headerRefMap[name].value += ', ' + header.value;
+            } else {
+                headerRefMap[name].value = header.value;
+            }
+
+            mergedHeaders.splice(i, 1);
+            len--;
+        }
+    }
+
+    for (i = 0, len = newHeaders.length; i < len; i++) {
         var index = getHeaderIndex(mergedHeaders, newHeaders[i]);
 
         //if a matching header is defined, replace it
